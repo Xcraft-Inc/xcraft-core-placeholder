@@ -1,0 +1,20 @@
+{
+  "name": "xcraft-core-placeholder",
+  "version": "0.1.0",
+  "description": "Xcraft placeholders minilib",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "xcraft"
+  ],
+  "repository" : {
+    "type" : "file",
+    "url" : "lib/xcraft-core-placeholder"
+  },
+  "author": "Mathieu Schroeter",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}
