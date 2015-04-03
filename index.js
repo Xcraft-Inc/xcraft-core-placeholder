@@ -7,6 +7,7 @@ function Placeholder () {
 
 Placeholder.prototype.set = function (key, value) {
   this.holders[key] = value;
+  return this;
 };
 
 Placeholder.prototype.inject = function (namespace, data) {
