@@ -20,5 +20,13 @@ Placeholder.prototype.inject = function (namespace, data) {
   return data;
 };
 
+Placeholder.prototype.injectFile = function (namespace, fileIn, fileOut) {
+  var fs = require ('fs');
+
+  var data = fs.readFileSync (fileIn, 'utf8');
+  data = this.inject (namespace, data);
+  fs.writeFileSync (fileOut, data, 'utf8');
+};
+
 exports.global = new Placeholder ();
 exports.Placeholder = Placeholder;
