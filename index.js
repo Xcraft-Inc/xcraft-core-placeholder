@@ -16,6 +16,17 @@ Placeholder.prototype.inject = function (namespace, data) {
   Object.keys (self.holders).forEach (function (placeholder) {
     var regex = new RegExp ('<' + namespace + '\\.' + placeholder + '>', 'g');
     data = data.replace (regex, self.holders[placeholder]);
+
+    /* Handle conditional placeholders like for example:
+     * <PEON.OS=darwin?osx:unix>
+     */
+    var regexIf = new RegExp ('<' + namespace + '\\.' + placeholder + '=([^?]*)\\?([^:]*):([^>]*)>');
+    var res = null;
+    while ((res = regexIf.exec (data))) {
+      var value = res[1] === self.holders[placeholder] ? res[2] : res[3];
+      var regexRep = new RegExp ('<' + namespace + '\\.' + placeholder + '=' + res[1] + '\\?[^>]*>', 'g');
+      data = data.replace (regexRep, value);
+    }
   });
   return data;
 };
