@@ -97,5 +97,19 @@ describe ('xcraft-core-placeholder', function () {
         .set ('BAR.FOO', 'foobar')
         .inject ('NS3', data).should.be.equal (expected);
     });
+
+    it ('inject a placeholder in itself', function () {
+      var expected = '';
+      expected += 'foobar <NS1.FOOBAR>\n';
+      expected += '<NS1.FOOBAR> foobar <NS1.FOOBAR>\n';
+      expected += 'foobar <NS1.BARFOO>\n';
+      expected += '<NS1.FOOBAR> foobar <NS2.FOOBAR>\n';
+      expected += '<NS2.FOOBAR> foobar\n';
+      expected += '<NS3.FOO.BAR> foobar <NS3.BAR.FOO>\n';
+      expected += '<NS3.FOO.BAR> foobar';
+
+      ph.set ('FOO.BAR', '<NS3.FOO.BAR>')
+        .inject ('NS3', data).should.be.equal (expected);
+    });
   });
 });
