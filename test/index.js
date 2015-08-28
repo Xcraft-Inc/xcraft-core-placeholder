@@ -7,14 +7,18 @@ describe ('xcraft-core-placeholder', function () {
   describe ('#inject ()', function () {
     var ph = null;
     var data = '';
-    data += 'foobar <NS1.FOOBAR>\n';
-    data += '<NS1.FOOBAR> foobar <NS1.FOOBAR>\n';
-    data += 'foobar <NS1.BARFOO>\n';
-    data += '<NS1.FOOBAR> foobar <NS2.FOOBAR>\n';
-    data += '<NS2.FOOBAR> foobar';
 
     beforeEach (function () {
       ph = new xPh.Placeholder ();
+
+      data  = '';
+      data += 'foobar <NS1.FOOBAR>\n';
+      data += '<NS1.FOOBAR> foobar <NS1.FOOBAR>\n';
+      data += 'foobar <NS1.BARFOO>\n';
+      data += '<NS1.FOOBAR> foobar <NS2.FOOBAR>\n';
+      data += '<NS2.FOOBAR> foobar\n';
+      data += '<NS3.FOO.BAR> foobar <NS3.BAR.FOO>\n';
+      data += '<NS3.FOO.BAR> foobar';
     });
 
     it ('inject one value for one namespace', function () {
@@ -23,7 +27,9 @@ describe ('xcraft-core-placeholder', function () {
       expected += 'raboof foobar raboof\n';
       expected += 'foobar <NS1.BARFOO>\n';
       expected += 'raboof foobar <NS2.FOOBAR>\n';
-      expected += '<NS2.FOOBAR> foobar';
+      expected += '<NS2.FOOBAR> foobar\n';
+      expected += '<NS3.FOO.BAR> foobar <NS3.BAR.FOO>\n';
+      expected += '<NS3.FOO.BAR> foobar';
 
       ph.set ('FOOBAR', 'raboof')
         .inject ('NS1', data).should.be.equal (expected);
@@ -35,7 +41,9 @@ describe ('xcraft-core-placeholder', function () {
       expected += 'raboof foobar raboof\n';
       expected += 'foobar foobar\n';
       expected += 'raboof foobar <NS2.FOOBAR>\n';
-      expected += '<NS2.FOOBAR> foobar';
+      expected += '<NS2.FOOBAR> foobar\n';
+      expected += '<NS3.FOO.BAR> foobar <NS3.BAR.FOO>\n';
+      expected += '<NS3.FOO.BAR> foobar';
 
       ph.set ('FOOBAR', 'raboof')
         .set ('BARFOO', 'foobar')
@@ -48,7 +56,9 @@ describe ('xcraft-core-placeholder', function () {
       expected += 'raboof foobar raboof\n';
       expected += 'foobar <NS1.BARFOO>\n';
       expected += 'raboof foobar raboof\n';
-      expected += 'raboof foobar';
+      expected += 'raboof foobar\n';
+      expected += '<NS3.FOO.BAR> foobar <NS3.BAR.FOO>\n';
+      expected += '<NS3.FOO.BAR> foobar';
 
       data = ph
         .set ('FOOBAR', 'raboof')
@@ -62,7 +72,9 @@ describe ('xcraft-core-placeholder', function () {
       expected += 'raboof foobar raboof\n';
       expected += 'foobar foobar\n';
       expected += 'raboof foobar raboof\n';
-      expected += 'raboof foobar';
+      expected += 'raboof foobar\n';
+      expected += '<NS3.FOO.BAR> foobar <NS3.BAR.FOO>\n';
+      expected += '<NS3.FOO.BAR> foobar';
 
       data = ph
         .set ('FOOBAR', 'raboof')
