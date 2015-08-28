@@ -46,7 +46,7 @@ Placeholder.prototype.inject = function (namespace, data) {
     data = data.replace (regex, self.holders[placeholder]);
 
     /* Handle conditional placeholders like for example:
-     * <PEON.OS=darwin?osx:unix>
+     * <PEON.OS=darwin?osx:other>
      */
     var regexIf = new RegExp ('<' + namespace + '\\.' + placeholder + '=([^?]*)\\?([^:]*):([^>]*)>');
     var res = null;
