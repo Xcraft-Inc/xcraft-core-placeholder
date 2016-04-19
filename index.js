@@ -34,7 +34,7 @@ Placeholder.prototype.set = function (key, value) {
   return this;
 };
 
-Placeholder.prototype.inject = function (namespace, data) {
+Placeholder.prototype.inject = function (namespace, data, escape) {
   var self = this;
 
   if (!self._isResolved) {
@@ -42,8 +42,13 @@ Placeholder.prototype.inject = function (namespace, data) {
   }
 
   Object.keys (self.holders).forEach (function (placeholder) {
+    let phValue = self.holders[placeholder];
+    if (escape && typeof phValue === 'string') {
+      phValue = phValue.replace (/\\/g, '\\\\');
+    }
+
     var regex = new RegExp ('<' + namespace + '\\.' + placeholder + '>', 'g');
-    data = data.replace (regex, self.holders[placeholder]);
+    data = data.replace (regex, phValue);
 
     /* Handle conditional placeholders like for example:
      * <PEON.OS=darwin?osx:other>
@@ -51,7 +56,7 @@ Placeholder.prototype.inject = function (namespace, data) {
     var regexIf = new RegExp ('<' + namespace + '\\.' + placeholder + '=([^?]*)\\?([^:]*):([^>]*)>');
     var res = null;
     while ((res = regexIf.exec (data))) {
-      var value = res[1] === self.holders[placeholder] ? res[2] : res[3];
+      var value = res[1] === phValue ? res[2] : res[3];
       var regexRep = new RegExp ('<' + namespace + '\\.' + placeholder + '=' + res[1] + '\\?[^>]*>', 'g');
       data = data.replace (regexRep, value);
     }
