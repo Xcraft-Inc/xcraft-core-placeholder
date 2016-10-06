@@ -13,9 +13,9 @@
     "xcraft",
     "placeholder"
   ],
-  "repository" : {
-    "type" : "git",
-    "url" : "git+https://github.com/Xcraft-Inc/xcraft-core-placeholder.git"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Xcraft-Inc/xcraft-core-placeholder.git"
   },
   "author": "Mathieu Schroeter",
   "license": "MIT",
