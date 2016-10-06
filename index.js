@@ -29,7 +29,14 @@ Placeholder.prototype._resolve = function (namespace) {
 };
 
 Placeholder.prototype.set = function (key, value) {
-  this.holders[key] = value;
+  if (value !== null && typeof value === 'object') {
+    Object
+      .keys (value)
+      .forEach ((item) => this.holders[`${key}.${item}`] = value[item]);
+  } else {
+    this.holders[key] = value;
+  }
+
   this._isResolved  = false;
   return this;
 };
