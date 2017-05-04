@@ -1,6 +1,5 @@
 'use strict';
 
-
 function Placeholder () {
   this.holders = {};
   this._isResolved = false;
@@ -21,7 +20,10 @@ Placeholder.prototype._resolve = function (namespace) {
         continue;
       }
 
-      self.holders[placeholder] = self.holders[placeholder].replace (regex, self.holders[res[1]]);
+      self.holders[placeholder] = self.holders[placeholder].replace (
+        regex,
+        self.holders[res[1]]
+      );
     }
   });
 
@@ -30,14 +32,14 @@ Placeholder.prototype._resolve = function (namespace) {
 
 Placeholder.prototype.set = function (key, value) {
   if (value !== null && typeof value === 'object') {
-    Object
-      .keys (value)
-      .forEach ((item) => this.holders[`${key}.${item}`] = value[item]);
+    Object.keys (value).forEach (
+      item => (this.holders[`${key}.${item}`] = value[item])
+    );
   } else {
     this.holders[key] = value;
   }
 
-  this._isResolved  = false;
+  this._isResolved = false;
   return this;
 };
 
@@ -60,11 +62,16 @@ Placeholder.prototype.inject = function (namespace, data, escape) {
     /* Handle conditional placeholders like for example:
      * <PEON.OS=darwin?osx:other>
      */
-    var regexIf = new RegExp ('<' + namespace + '\\.' + placeholder + '=([^?]*)\\?([^:]*):([^>]*)>');
+    var regexIf = new RegExp (
+      '<' + namespace + '\\.' + placeholder + '=([^?]*)\\?([^:]*):([^>]*)>'
+    );
     var res = null;
     while ((res = regexIf.exec (data))) {
       var value = res[1] === phValue ? res[2] : res[3];
-      var regexRep = new RegExp ('<' + namespace + '\\.' + placeholder + '=' + res[1] + '\\?[^>]*>', 'g');
+      var regexRep = new RegExp (
+        '<' + namespace + '\\.' + placeholder + '=' + res[1] + '\\?[^>]*>',
+        'g'
+      );
       data = data.replace (regexRep, value);
     }
   });
