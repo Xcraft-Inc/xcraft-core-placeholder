@@ -9,10 +9,7 @@
   "scripts": {
     "test": "mocha test/"
   },
-  "keywords": [
-    "xcraft",
-    "placeholder"
-  ],
+  "keywords": ["xcraft", "placeholder"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Xcraft-Inc/xcraft-core-placeholder.git"
@@ -26,6 +23,6 @@
   "devDependencies": {
     "mocha": "^5.2.0",
     "should": "^11.1.0",
-    "xcraft-dev-rules": "^0.2.0"
+    "xcraft-dev-rules": "^0.3.0"
   }
 }
