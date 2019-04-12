@@ -69,8 +69,7 @@ Placeholder.prototype.inject = function(namespace, data, escape) {
     while ((res = regexIf.exec(data))) {
       var value = res[1] === phValue ? res[2] : res[3];
       var regexRep = new RegExp(
-        '<' + namespace + '\\.' + placeholder + '=' + res[1] + '\\?[^>]*>',
-        'g'
+        '<' + namespace + '\\.' + placeholder + '=' + res[1] + '\\?[^>]*>'
       );
       data = data.replace(regexRep, value);
     }
