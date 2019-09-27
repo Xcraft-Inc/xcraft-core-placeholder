@@ -87,6 +87,7 @@ Placeholder.prototype.injectFile = function(namespace, fileIn, fileOut) {
   var data = fs.readFileSync(fileIn, 'utf8');
   data = this.inject(namespace, data);
   fs.writeFileSync(fileOut, data, 'utf8');
+  return this;
 };
 
 exports.global = new Placeholder();
