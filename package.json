@@ -23,6 +23,9 @@
     "url": "https://github.com/Xcraft-Inc/xcraft-core-placeholder/issues"
   },
   "homepage": "https://github.com/Xcraft-Inc/xcraft-core-placeholder#readme",
+  "dependencies": {
+    "escape-string-regexp": "^1.0.5"
+  },
   "devDependencies": {
     "mocha": "^5.2.0",
     "prettier": "1.18.2",

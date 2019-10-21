@@ -1,5 +1,7 @@
 'use strict';
 
+const escapeStringRegexp = require('escape-string-regexp');
+
 function Placeholder() {
   this.holders = {};
   this._isResolved = false;
@@ -56,20 +58,33 @@ Placeholder.prototype.inject = function(namespace, data, escape) {
       phValue = phValue.replace(/\\/g, '\\\\');
     }
 
-    var regex = new RegExp('<' + namespace + '\\.' + placeholder + '>', 'g');
+    var regex = new RegExp(
+      '<' + namespace + '\\.' + escapeStringRegexp(placeholder) + '>',
+      'g'
+    );
     data = data.replace(regex, phValue);
 
     /* Handle conditional placeholders like for example:
      * <PEON.OS=darwin?osx:other>
      */
     var regexIf = new RegExp(
-      '<' + namespace + '\\.' + placeholder + '=([^?]*)\\?([^:]*):([^>]*)>'
+      '<' +
+        namespace +
+        '\\.' +
+        escapeStringRegexp(placeholder) +
+        '=([^?]*)\\?([^:]*):([^>]*)>'
     );
     var res = null;
     while ((res = regexIf.exec(data))) {
       var value = res[1] === phValue ? res[2] : res[3];
       var regexRep = new RegExp(
-        '<' + namespace + '\\.' + placeholder + '=' + res[1] + '\\?[^>]*>'
+        '<' +
+          namespace +
+          '\\.' +
+          escapeStringRegexp(placeholder) +
+          '=' +
+          res[1] +
+          '\\?[^>]*>'
       );
       data = data.replace(regexRep, value);
     }
