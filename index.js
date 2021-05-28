@@ -52,21 +52,15 @@ Placeholder.prototype.inject = function (namespace, data, escape) {
     self._resolve(namespace);
   }
 
+  /* Handle conditional placeholders like for example:
+   * <PEON.OS=darwin?osx:other>
+   */
   Object.keys(self.holders).forEach(function (placeholder) {
     let phValue = self.holders[placeholder];
     if (escape && typeof phValue === 'string') {
       phValue = phValue.replace(/\\/g, '\\\\');
     }
 
-    var regex = new RegExp(
-      '<' + namespace + '\\.' + escapeStringRegexp(placeholder) + '>',
-      'g'
-    );
-    data = data.replace(regex, phValue);
-
-    /* Handle conditional placeholders like for example:
-     * <PEON.OS=darwin?osx:other>
-     */
     var regexIf = new RegExp(
       '<' +
         namespace +
@@ -89,6 +83,29 @@ Placeholder.prototype.inject = function (namespace, data, escape) {
       data = data.replace(regexRep, value);
     }
   });
+
+  /* Handle simple placeholders */
+  Object.keys(self.holders).forEach(function (placeholder) {
+    let phValue = self.holders[placeholder];
+    if (escape && typeof phValue === 'string') {
+      phValue = phValue.replace(/\\/g, '\\\\');
+    }
+
+    const regexes = ['<>', '{}'].map(
+      (char) =>
+        new RegExp(
+          char[0] +
+            namespace +
+            '\\.' +
+            escapeStringRegexp(placeholder) +
+            char[1],
+          'g'
+        )
+    );
+
+    regexes.forEach((regex) => (data = data.replace(regex, phValue)));
+  });
+
   return data;
 };
 
