@@ -34,9 +34,14 @@ Placeholder.prototype._resolve = function (namespace) {
 
 Placeholder.prototype.set = function (key, value) {
   if (value !== null && typeof value === 'object') {
-    Object.keys(value).forEach(
-      (item) => (this.holders[`${key}.${item}`] = value[item])
-    );
+    let itemUpperCase = false;
+    if (process.platform === 'win32' && key === 'ENV') {
+      itemUpperCase = true; /* Windows environment is case insensitive */
+    }
+    Object.keys(value).forEach((item) => {
+      this.holders[`${key}.${itemUpperCase ? item.toUpperCase() : item}`] =
+        value[item];
+    });
   } else {
     this.holders[key] = value;
   }
