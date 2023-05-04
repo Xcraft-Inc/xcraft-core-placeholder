@@ -3,8 +3,8 @@
 var should = require('should'); /* jshint ignore:line */
 var xPh = require('../index.js');
 
-describe('xcraft-core-placeholder', function () {
-  describe('#inject ()', function () {
+describe('xcraft.placeholder', function () {
+  describe('inject', function () {
     var ph = null;
     var data = '';
 
@@ -21,7 +21,7 @@ describe('xcraft-core-placeholder', function () {
       data += '<NS3.FOO.BAR> foobar';
     });
 
-    it('inject one value for one namespace', function () {
+    it('one value for one namespace', function () {
       var expected = '';
       expected += 'foobar raboof\n';
       expected += 'raboof foobar raboof\n';
@@ -34,7 +34,7 @@ describe('xcraft-core-placeholder', function () {
       ph.set('FOOBAR', 'raboof').inject('NS1', data).should.be.equal(expected);
     });
 
-    it('inject two values for one namespace', function () {
+    it('two values for one namespace', function () {
       var expected = '';
       expected += 'foobar raboof\n';
       expected += 'raboof foobar raboof\n';
@@ -50,7 +50,7 @@ describe('xcraft-core-placeholder', function () {
         .should.be.equal(expected);
     });
 
-    it('inject one value for two namespaces', function () {
+    it('one value for two namespaces', function () {
       var expected = '';
       expected += 'foobar raboof\n';
       expected += 'raboof foobar raboof\n';
@@ -64,7 +64,7 @@ describe('xcraft-core-placeholder', function () {
       ph.inject('NS2', data).should.be.equal(expected);
     });
 
-    it('inject two values for two namespaces', function () {
+    it('two values for two namespaces', function () {
       var expected = '';
       expected += 'foobar raboof\n';
       expected += 'raboof foobar raboof\n';
@@ -81,7 +81,7 @@ describe('xcraft-core-placeholder', function () {
       ph.inject('NS2', data).should.be.equal(expected);
     });
 
-    it('inject a placeholder in a placeholder', function () {
+    it('a placeholder in a placeholder', function () {
       var expected = '';
       expected += 'foobar <NS1.FOOBAR>\n';
       expected += '<NS1.FOOBAR> foobar <NS1.FOOBAR>\n';
@@ -97,7 +97,7 @@ describe('xcraft-core-placeholder', function () {
         .should.be.equal(expected);
     });
 
-    it('inject a placeholder in itself', function () {
+    it('a placeholder in itself', function () {
       var expected = '';
       expected += 'foobar <NS1.FOOBAR>\n';
       expected += '<NS1.FOOBAR> foobar <NS1.FOOBAR>\n';
@@ -112,7 +112,7 @@ describe('xcraft-core-placeholder', function () {
         .should.be.equal(expected);
     });
 
-    it('inject an object', function () {
+    it('an object', function () {
       let expected = '';
       expected += 'foobar <NS1.FOOBAR>\n';
       expected += '<NS1.FOOBAR> foobar <NS1.FOOBAR>\n';
