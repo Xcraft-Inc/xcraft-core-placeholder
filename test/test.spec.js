@@ -1,6 +1,6 @@
 'use strict';
 
-var should = require('should'); /* jshint ignore:line */
+var {expect} = require('chai'); /* jshint ignore:line */
 var xPh = require('../index.js');
 
 describe('xcraft.placeholder', function () {
@@ -31,7 +31,7 @@ describe('xcraft.placeholder', function () {
       expected += '<NS3.FOO.BAR> foobar <NS3.BAR.FOO>\n';
       expected += '<NS3.FOO.BAR> foobar';
 
-      ph.set('FOOBAR', 'raboof').inject('NS1', data).should.be.equal(expected);
+      expect(ph.set('FOOBAR', 'raboof').inject('NS1', data)).be.equal(expected);
     });
 
     it('two values for one namespace', function () {
@@ -44,10 +44,9 @@ describe('xcraft.placeholder', function () {
       expected += '<NS3.FOO.BAR> foobar <NS3.BAR.FOO>\n';
       expected += '<NS3.FOO.BAR> foobar';
 
-      ph.set('FOOBAR', 'raboof')
-        .set('BARFOO', 'foobar')
-        .inject('NS1', data)
-        .should.be.equal(expected);
+      expect(
+        ph.set('FOOBAR', 'raboof').set('BARFOO', 'foobar').inject('NS1', data)
+      ).be.equal(expected);
     });
 
     it('one value for two namespaces', function () {
@@ -61,7 +60,7 @@ describe('xcraft.placeholder', function () {
       expected += '<NS3.FOO.BAR> foobar';
 
       data = ph.set('FOOBAR', 'raboof').inject('NS1', data);
-      ph.inject('NS2', data).should.be.equal(expected);
+      expect(ph.inject('NS2', data)).be.equal(expected);
     });
 
     it('two values for two namespaces', function () {
@@ -78,7 +77,7 @@ describe('xcraft.placeholder', function () {
         .set('FOOBAR', 'raboof')
         .set('BARFOO', 'foobar')
         .inject('NS1', data);
-      ph.inject('NS2', data).should.be.equal(expected);
+      expect(ph.inject('NS2', data)).be.equal(expected);
     });
 
     it('a placeholder in a placeholder', function () {
@@ -91,10 +90,12 @@ describe('xcraft.placeholder', function () {
       expected += 'foobar foobar foobar\n';
       expected += 'foobar foobar';
 
-      ph.set('FOO.BAR', '<NS3.BAR.FOO>')
-        .set('BAR.FOO', 'foobar')
-        .inject('NS3', data)
-        .should.be.equal(expected);
+      expect(
+        ph
+          .set('FOO.BAR', '<NS3.BAR.FOO>')
+          .set('BAR.FOO', 'foobar')
+          .inject('NS3', data)
+      ).be.equal(expected);
     });
 
     it('a placeholder in itself', function () {
@@ -107,9 +108,9 @@ describe('xcraft.placeholder', function () {
       expected += '<NS3.FOO.BAR> foobar <NS3.BAR.FOO>\n';
       expected += '<NS3.FOO.BAR> foobar';
 
-      ph.set('FOO.BAR', '<NS3.FOO.BAR>')
-        .inject('NS3', data)
-        .should.be.equal(expected);
+      expect(ph.set('FOO.BAR', '<NS3.FOO.BAR>').inject('NS3', data)).be.equal(
+        expected
+      );
     });
 
     it('an object', function () {
@@ -122,11 +123,13 @@ describe('xcraft.placeholder', function () {
       expected += '-Os -fPIC -g foobar <NS3.BAR.FOO>\n';
       expected += '-Os -fPIC -g foobar';
 
-      ph.set('FOO', {
-        BAR: '-Os -fPIC -g',
-      })
-        .inject('NS3', data)
-        .should.be.equal(expected);
+      expect(
+        ph
+          .set('FOO', {
+            BAR: '-Os -fPIC -g',
+          })
+          .inject('NS3', data)
+      ).be.equal(expected);
     });
   });
 });
