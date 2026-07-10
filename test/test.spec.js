@@ -123,13 +123,9 @@ describe('xcraft.placeholder', function () {
       expected += '-Os -fPIC -g foobar <NS3.BAR.FOO>\n';
       expected += '-Os -fPIC -g foobar';
 
-      expect(
-        ph
-          .set('FOO', {
-            BAR: '-Os -fPIC -g',
-          })
-          .inject('NS3', data)
-      ).be.equal(expected);
+      expect(ph.set('FOO', {BAR: '-Os -fPIC -g'}).inject('NS3', data)).be.equal(
+        expected
+      );
     });
   });
 });
