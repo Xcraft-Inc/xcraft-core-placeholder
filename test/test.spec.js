@@ -4,7 +4,7 @@ var {expect} = require('chai'); /* jshint ignore:line */
 var xPh = require('../index.js');
 
 describe('xcraft.placeholder', function () {
-  describe('inject', function () {
+  describe('inject 1', function () {
     var ph = null;
     var data = '';
 
@@ -126,6 +126,27 @@ describe('xcraft.placeholder', function () {
       expect(ph.set('FOO', {BAR: '-Os -fPIC -g'}).inject('NS3', data)).be.equal(
         expected
       );
+    });
+  });
+
+  describe('inject 2', function () {
+    var ph = null;
+    var data = '';
+
+    beforeEach(function () {
+      ph = new xPh.Placeholder();
+
+      data = '';
+      data += 'foobar <NS1.FOOBAR>\n';
+      data += '<NS1.FOOBAR[.,1]> foobar <NS1.FOOBAR[.,0]>\n';
+    });
+
+    it('with a splitter', function () {
+      let expected = '';
+      expected += 'foobar 1.2.3\n';
+      expected += '2 foobar 1\n';
+
+      expect(ph.set('FOOBAR', '1.2.3').inject('NS1', data)).be.equal(expected);
     });
   });
 });

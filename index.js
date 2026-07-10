@@ -100,15 +100,31 @@ Placeholder.prototype.inject = function (namespace, data, escape) {
       (char) =>
         new RegExp(
           char[0] +
-            namespace +
-            '\\.' +
-            escapeStringRegexp(placeholder) +
+          namespace +
+          '\\.' +
+          escapeStringRegexp(placeholder) +
+          '(\\[[^\\]]+\\])?' /* For special splitting syntax [<char>,<idx>] */ +
             char[1],
           'g'
         )
     );
 
-    regexes.forEach((regex) => (data = data.replace(regex, phValue)));
+    regexes.forEach((regex) => {
+      data = data.replace(regex, (_ph) => {
+        let sp = null;
+
+        /* Look for splitting */
+        if (/\[[^\]]+\]/.test(_ph)) {
+          const it = _ph.indexOf('[');
+          sp = _ph.substring(it);
+          sp = sp.substring(1, sp.length - 2);
+          sp = sp.split(',');
+          _ph = _ph.substring(0, it) + _ph.substring(_ph.length - 1);
+        }
+
+        return sp ? phValue.split(sp[0])[sp[1]] : phValue;
+      });
+    });
   });
 
   return data;
