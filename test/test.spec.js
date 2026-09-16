@@ -197,9 +197,9 @@ describe('xcraft.placeholder', function () {
       expect(ph.set('OS', 'darwin').inject('NS1', data)).be.equal(expected);
     });
 
-    it('an escaped "\\:" is literal', function () {
-      const data = '<NS1.TIME=12?heure\\: 12:autre>';
-      expect(ph.set('TIME', '12').inject('NS1', data)).be.equal('heure: 12');
+    it('an escaped "\\:"', function () {
+      const data = '<NS1.TIME=12?hour\\: 12:autre>';
+      expect(ph.set('TIME', '12').inject('NS1', data)).be.equal('hour: 12');
     });
 
     it('an escaped "\\:"', function () {
