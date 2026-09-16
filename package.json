@@ -1,6 +1,6 @@
 {
   "name": "xcraft-core-placeholder",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "Xcraft placeholders minilib",
   "main": "index.js",
   "engines": {
