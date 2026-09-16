@@ -119,7 +119,6 @@ Placeholder.prototype.inject = function (namespace, data, escape) {
           sp = _ph.substring(it);
           sp = sp.substring(1, sp.length - 2);
           sp = sp.split(',');
-          _ph = _ph.substring(0, it) + _ph.substring(_ph.length - 1);
         }
 
         return sp ? phValue.split(sp[0])[sp[1]] : phValue;
