@@ -71,18 +71,26 @@ Placeholder.prototype.inject = function (namespace, data, escape) {
         namespace +
         '\\.' +
         escapeStringRegexp(placeholder) +
-        '=([^?]*)\\?([^:]*):([^>]*)>'
+        '=((?:\\\\.|[^?])*)\\?((?:\\\\.|[^:])*):((?:\\\\.|[^>])*)>'
     );
     var res = null;
     while ((res = regexIf.exec(data))) {
-      var value = res[1] === phValue ? res[2] : res[3];
-      var regexRep = new RegExp(
+      const rawCompare = res[1];
+      const rawTrue = res[2];
+      const rawFalse = res[3];
+
+      const unescape = (s) => s.replace(/\\(.)/g, '$1');
+      const compareValue = unescape(rawCompare);
+      const value =
+        compareValue === phValue ? unescape(rawTrue) : unescape(rawFalse);
+
+      const regexRep = new RegExp(
         '<' +
           namespace +
           '\\.' +
           escapeStringRegexp(placeholder) +
           '=' +
-          res[1] +
+          escapeStringRegexp(rawCompare) +
           '\\?[^>]*>'
       );
       data = data.replace(regexRep, value);
