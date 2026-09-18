@@ -23,24 +23,25 @@ Le module expose deux éléments principaux via `index.js` :
 La syntaxe des placeholders supportée par `inject` est la suivante :
 
 - **Placeholders simples** : `<NAMESPACE.CLE>` ou `{NAMESPACE.CLE}`.
-- **Placeholders conditionnels** : `<NAMESPACE.CLE=valeur?valeur_si_vrai:valeur_si_faux>`.
-- **Placeholders avec découpage** : `<NAMESPACE.CLE[separateur,index]>`, qui découpe la valeur associée à la clé selon un séparateur et n'en retient que le segment à l'index indiqué.
+- **Placeholders conditionnels** : `<NAMESPACE.CLE=valeur?valeur_si_vrai:valeur_si_faux>`, avec prise en charge de l'échappement du caractère `:` (et de tout autre caractère) via un antislash à l'intérieur de la valeur comparée, de la branche vraie et de la branche fausse.
+- **Placeholders avec découpage** : `<NAMESPACE.CLE[separateur,index]>`, qui découpe la valeur associée à la clé selon un séparateur (pouvant compter plusieurs caractères) et n'en retient que le segment à l'index indiqué.
 - **Placeholders imbriqués** : la valeur d'un placeholder peut elle-même contenir une référence à un autre placeholder (résolue avant l'injection).
 
 ## Fonctionnement global
 
 Le cycle de vie d'une instance `Placeholder` se déroule en trois étapes :
 
-1. **Définition des valeurs** — via `set(key, value)`, qui associe une clé à une valeur. Si la valeur est un objet, elle est automatiquement décomposée en clés à points (dot notation), par exemple `{BAR: '-Os -fPIC -g'}` défini sous la clé `FOO` devient la clé interne `FOO.BAR`.
+1. **Définition des valeurs** — via `set(key, value)`, qui associe une clé à une valeur. Si la valeur est un objet, elle est automatiquement décomposée en clés à points (dot notation) ; par exemple `{BAR: '-Os -fPIC -g'}` défini sous la clé `FOO` devient la clé interne `FOO.BAR`.
 2. **Résolution interne** — déclenchée automatiquement au premier appel à `inject` ou `injectFile` (ou après tout nouvel appel à `set`, qui invalide la résolution précédente via `_isResolved`). Elle remplace, au sein des valeurs stockées, les références internes du type `<namespace.cle>` par leur valeur correspondante, avec une protection contre l'auto-référence (un placeholder qui se référence lui-même n'est pas résolu, afin d'éviter une boucle infinie).
 3. **Injection** — via `inject(namespace, data, escape)`, qui remplace dans `data` toutes les occurrences des placeholders du `namespace` donné :
-   - d'abord les formes conditionnelles (`<NS.CLE=val?vrai:faux>`),
+   - d'abord les formes conditionnelles (`<NS.CLE=val?vrai:faux>`), en désescapant les séquences `\x` présentes dans la valeur comparée et dans les deux branches avant de procéder à la comparaison et à la substitution,
    - puis les formes simples, avec gestion optionnelle du découpage (`[separateur,index]`) et des deux syntaxes de délimiteurs `<>` et `{}`.
 
-Le module gère également deux cas particuliers :
+Le module gère également plusieurs cas particuliers :
 
 - **Windows et variables d'environnement** : lorsqu'une valeur objet est définie sous la clé `ENV` et que le processus tourne sous `win32`, les noms de variables sont automatiquement convertis en majuscules, l'environnement Windows étant insensible à la casse.
-- **Échappement des backslashes** : le troisième paramètre `escape` de `inject`, lorsqu'il vaut `true`, double les antislashs présents dans les valeurs de type chaîne avant substitution, ce qui est utile pour insérer des chemins Windows dans un template sans casser l'échappement de celui-ci.
+- **Échappement des backslashes** : le troisième paramètre `escape` de `inject`, lorsqu'il vaut `true`, double les antislashs présents dans les valeurs de type chaîne avant substitution (uniquement pour les valeurs de type `string` ; les autres types, comme les nombres, sont simplement convertis en chaîne lors du remplacement), ce qui est utile pour insérer des chemins Windows dans un template sans casser l'échappement de celui-ci.
+- **Découpage hors limites** : si l'index demandé dans la syntaxe `[separateur,index]` dépasse le nombre de segments obtenus après découpage, le remplacement produit la chaîne littérale `"undefined"`.
 
 ## Exemples d'utilisation
 
@@ -146,7 +147,7 @@ const result = ph.inject('WIN', template, true); // escape=true
 
 ## Interactions avec d'autres modules
 
-`xcraft-core-placeholder` est une bibliothèque utilitaire de bas niveau, sans dépendance vers d'autres modules Xcraft, mise à disposition des composants du framework pour :
+`xcraft-core-placeholder` est une bibliothèque utilitaire de bas niveau, sans dépendance vers d'autres modules Xcraft (sa seule dépendance externe est `escape-string-regexp`), mise à disposition des composants du framework pour :
 
 - **Configuration dynamique** : génération de fichiers de configuration à partir de templates paramétrables.
 - **Scripts de build** : injection de variables (chemins, flags de compilation, versions) dans des makefiles ou scripts de compilation.
@@ -172,7 +173,7 @@ Chaque instance de `Placeholder` maintient :
 #### Méthodes publiques
 
 - **`set(key, value)`** — Définit une valeur pour une clé donnée. Si `value` est un objet, il est décomposé en clés à points (`{BAR: 'x'}` sous la clé `FOO` devient `FOO.BAR`). Cas particulier : si `key === 'ENV'` et que le processus tourne sous Windows (`process.platform === 'win32'`), les sous-clés sont converties en majuscules. Retourne l'instance courante pour permettre le chaînage.
-- **`inject(namespace, data, escape=false)`** — Remplace dans `data` tous les placeholders appartenant au `namespace` donné. Prend en charge les formes conditionnelles (`<NS.CLE=val?vrai:faux>`), les formes simples avec les deux syntaxes `<>`/`{}`, ainsi que le découpage de valeur via `[separateur,index]`. Le paramètre `escape`, s'il vaut `true`, double les antislashs des valeurs de type chaîne avant substitution. Déclenche une résolution interne préalable si nécessaire. Retourne la chaîne transformée.
+- **`inject(namespace, data, escape=false)`** — Remplace dans `data` tous les placeholders appartenant au `namespace` donné. Prend en charge les formes conditionnelles (`<NS.CLE=val?vrai:faux>`, avec désescapement des séquences `\x`), les formes simples avec les deux syntaxes `<>`/`{}`, ainsi que le découpage de valeur via `[separateur,index]`. Le paramètre `escape`, s'il vaut `true`, double les antislashs des valeurs de type chaîne avant substitution. Déclenche une résolution interne préalable si nécessaire. Retourne la chaîne transformée.
 - **`injectFile(namespace, fileIn, fileOut)`** — Lit le fichier `fileIn` (encodage UTF-8), y applique `inject` pour le `namespace` donné, puis écrit le résultat dans `fileOut` (UTF-8). Retourne l'instance courante pour permettre le chaînage.
 
 #### Méthodes privées
@@ -182,20 +183,25 @@ Chaque instance de `Placeholder` maintient :
 #### Particularités et cas limites
 
 - **Compatibilité Windows** : la mise en majuscule automatique des sous-clés d'un objet `ENV` ne s'applique que sous `win32`, afin de respecter l'insensibilité à la casse des variables d'environnement de ce système.
-- **Découpage de valeur** : la syntaxe `[separateur,index]` accolée à un placeholder (ex. `<NS.VERSION[.,0]>`) permet d'extraire un segment précis d'une valeur composite sans avoir à la redécouper manuellement en amont.
+- **Découpage de valeur** : la syntaxe `[separateur,index]` accolée à un placeholder (ex. `<NS.VERSION[.,0]>`) permet d'extraire un segment précis d'une valeur composite sans avoir à la redécouper manuellement en amont. Le séparateur peut compter plusieurs caractères (ex. `[::,2]`). Si l'index demandé n'existe pas dans le tableau résultant du découpage, la chaîne `"undefined"` est insérée.
 - **Double syntaxe de délimiteurs** : les formes `<...>` et `{...}` sont toutes deux acceptées pour un même placeholder, ce qui facilite l'usage dans des contextes où les chevrons sont déjà utilisés à d'autres fins (ex. templates HTML).
+- **Placeholders conditionnels échappés** : dans la syntaxe `<NS.CLE=val?vrai:faux>`, les caractères `?` et `:` peuvent être inclus littéralement dans la valeur comparée ou dans les branches en les précédant d'un antislash (ex. `<NS1.RATIO=1\:1?egal:different>`) ; ces séquences sont désescapées avant comparaison et substitution.
 - **Protection contre les références circulaires** : uniquement partielle — seule l'auto-référence directe d'une clé vers elle-même est détectée et ignorée ; une boucle indirecte entre plusieurs clés n'est pas explicitement détectée par le code.
 
 ### `test/test.spec.js`
 
-Suite de tests Mocha/Chai couvrant le comportement de `inject`, notamment : substitution simple, substitution avec plusieurs valeurs et plusieurs namespaces, résolution de placeholders imbriqués (y compris l'auto-référence), gestion des objets complexes, et découpage de valeur via la syntaxe `[separateur,index]`.
+Suite de tests Mocha/Chai couvrant le comportement de `inject`, organisée en cinq groupes :
+
+- **inject 1** — substitution simple, substitution avec plusieurs valeurs et plusieurs namespaces, résolution de placeholders imbriqués (y compris l'auto-référence), et gestion des objets complexes.
+- **inject 2** — découpage de valeur via la syntaxe `[separateur,index]`.
+- **inject 3** — placeholders conditionnels, y compris avec plusieurs occurrences, plusieurs placeholders distincts, des espaces dans les valeurs, des clés absentes, des namespaces distincts et des caractères `:` échappés.
+- **inject 4** — option `escape` du doublement des antislashs, y compris pour les valeurs non-chaînes.
+- **inject 5** — syntaxe de découpage avec séparateurs multi-caractères, syntaxe `{}`, mélange de placeholders découpés et non découpés, et gestion d'un index de découpage hors limites.
 
 ## Licence
 
 Ce module est distribué sous [licence MIT](./LICENSE).
 
 _Ce contenu a été généré par IA_
-
----
 
 [xcraft-core-placeholder]: https://github.com/Xcraft-Inc/xcraft-core-placeholder
