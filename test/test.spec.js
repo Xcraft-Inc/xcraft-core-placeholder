@@ -213,12 +213,6 @@ describe('xcraft.placeholder', function () {
       const expectedTrue = ph.set('VAR', 'test').inject('NS1', data);
       expect(expectedTrue).be.equal('is:test:ok');
     });
-
-    it('nested conditional placeholders', function () {
-      const data = `const arch  = '<PEON.OS.ARCH=x64?intel:{PEON.OS.ARCH=arm64?silicon:}>';`;
-      const result = ph.set('OS.ARCH', 'arm64').inject('PEON', data);
-      expect(result).be.equal(`const arch  = 'silicon';`);
-    });
   });
 
   describe('inject 4 - escape option', function () {

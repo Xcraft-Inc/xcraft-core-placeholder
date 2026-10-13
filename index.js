@@ -59,46 +59,42 @@ Placeholder.prototype.inject = function (namespace, data, escape) {
 
   /* Handle conditional placeholders like for example:
    * <PEON.OS=darwin?osx:other>
-   * The {} syntax is also supported (useful for nesting):
-   * <PEON.ARCH=x64?intel:{PEON.ARCH=arm64?silicon:}>
    */
-  const unescape = (s) => s.replace(/\\(.)/g, '$1');
+  Object.keys(self.holders).forEach(function (placeholder) {
+    let phValue = self.holders[placeholder];
+    if (escape && typeof phValue === 'string') {
+      phValue = phValue.replace(/\\/g, '\\\\');
+    }
 
-  ['<>', '{}'].forEach((delims) => {
-    const open = escapeStringRegexp(delims[0]);
-    const close = escapeStringRegexp(delims[1]);
+    var regexIf = new RegExp(
+      '<' +
+        namespace +
+        '\\.' +
+        escapeStringRegexp(placeholder) +
+        '=((?:\\\\.|[^?])*)\\?((?:\\\\.|[^:])*):((?:\\\\.|[^>])*)>'
+    );
+    var res = null;
+    while ((res = regexIf.exec(data))) {
+      const rawCompare = res[1];
+      const rawTrue = res[2];
+      const rawFalse = res[3];
 
-    Object.keys(self.holders).forEach(function (placeholder) {
-      let phValue = self.holders[placeholder];
-      if (escape && typeof phValue === 'string') {
-        phValue = phValue.replace(/\\/g, '\\\\');
-      }
+      const unescape = (s) => s.replace(/\\(.)/g, '$1');
+      const compareValue = unescape(rawCompare);
+      const value =
+        compareValue === phValue ? unescape(rawTrue) : unescape(rawFalse);
 
-      const regexIf = new RegExp(
-        open +
+      const regexRep = new RegExp(
+        '<' +
           namespace +
           '\\.' +
           escapeStringRegexp(placeholder) +
-          '=((?:\\\\.|[^?])*)\\?((?:\\\\.|[^:])*):((?:\\\\.|[^' +
-          close +
-          '])*)' +
-          close
+          '=' +
+          escapeStringRegexp(rawCompare) +
+          '\\?[^>]*>'
       );
-
-      let res = null;
-      while ((res = regexIf.exec(data))) {
-        const compareValue = unescape(res[1]);
-        const value =
-          compareValue === String(phValue)
-            ? unescape(res[2])
-            : unescape(res[3]);
-
-        data =
-          data.slice(0, res.index) +
-          value +
-          data.slice(res.index + res[0].length);
-      }
-    });
+      data = data.replace(regexRep, value);
+    }
   });
 
   /* Handle simple placeholders */
